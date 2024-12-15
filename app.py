@@ -1,13 +1,16 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from utils.image_processing import fetch_image, crop_image, remove_background
-from config import AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_BUCKET_NAME, AWS_REGION
+import streamlit as st
+from PIL import Image
+from io import BytesIO
+from rembg import remove
 import boto3
 import uuid
 import os
 
-# Initialize FastAPI
-app = FastAPI()
+# AWS Configuration
+AWS_ACCESS_KEY = "your_aws_access_key"
+AWS_SECRET_KEY = "your_aws_secret_key"
+AWS_BUCKET_NAME = "your_s3_bucket_name"
+AWS_REGION = "your_aws_region"
 
 # Initialize S3 client
 s3_client = boto3.client(
@@ -17,61 +20,105 @@ s3_client = boto3.client(
     region_name=AWS_REGION,
 )
 
+# Image Processing Functions
+def fetch_image(image_url: str) -> Image:
+    """Fetch an image from a URL."""
+    import requests
+    response = requests.get(image_url)
+    return Image.open(BytesIO(response.content))
 
-# Request and Response Models
-class BoundingBox(BaseModel):
-    x_min: int
-    y_min: int
-    x_max: int
-    y_max: int
+def load_object_image() -> Image:
+    """Load a default object image."""
+    object_image_path = "path_to_object_image.png"  # Replace with actual path
+    return Image.open(object_image_path)
 
+def crop_image(image: Image, bounding_box: dict) -> Image:
+    """Crop the image based on bounding box."""
+    x_min, y_min, x_max, y_max = bounding_box.values()
+    return image.crop((x_min, y_min, x_max, y_max))
 
-class ImageRequest(BaseModel):
-    image_url: str
-    bounding_box: BoundingBox
+def remove_background(image: Image) -> Image:
+    """Remove background from an image."""
+    img_byte_array = BytesIO()
+    image.save(img_byte_array, format="PNG")
+    output_data = remove(img_byte_array.getvalue())
+    return Image.open(BytesIO(output_data))
 
+def place_object(image: Image, object_image: Image, coords: tuple) -> Image:
+    """Place the object image at specified coordinates on the input image."""
+    x, y = coords
+    object_image_resized = object_image.resize((100, 100))  # Adjust dimensions as needed
+    if object_image_resized.mode != "RGBA":
+        object_image_resized = object_image_resized.convert("RGBA")
+    new_image = image.copy()
+    new_image.paste(object_image_resized, (x, y), object_image_resized)
+    return new_image
 
-class ImageResponse(BaseModel):
-    original_image_url: str
-    processed_image_url: str
+# Streamlit App
+st.title("Image Processing App")
+st.markdown("Upload an image or provide a URL to crop, remove the background, and overlay an object.")
 
+# Input Options
+image_source = st.radio("Select Image Source", ("Upload Image", "Image URL"))
 
-@app.post("/remove-background", response_model=ImageResponse)
-def remove_background_api(request: ImageRequest):
+# Image Upload or URL Input
+if image_source == "Upload Image":
+    uploaded_file = st.file_uploader("Upload an Image", type=["png", "jpg", "jpeg"])
+    if uploaded_file:
+        input_image = Image.open(uploaded_file)
+elif image_source == "Image URL":
+    image_url = st.text_input("Enter Image URL")
+    if image_url:
+        try:
+            input_image = fetch_image(image_url)
+        except Exception as e:
+            st.error(f"Failed to fetch image: {e}")
+            input_image = None
+else:
+    input_image = None
+
+# Display Input Image
+if input_image:
+    st.image(input_image, caption="Input Image", use_column_width=True)
+
+# Bounding Box Input
+st.subheader("Bounding Box Parameters")
+x_min = st.number_input("x_min", min_value=0, value=0)
+y_min = st.number_input("y_min", min_value=0, value=0)
+x_max = st.number_input("x_max", min_value=0, value=100)
+y_max = st.number_input("y_max", min_value=0, value=100)
+
+# Process Image Button
+if st.button("Process Image") and input_image:
     try:
-        # Fetch the main image
-        image = fetch_image(request.image_url)
+        # Load object image
+        object_image = load_object_image()
 
-        # Crop the main image based on the provided bounding box
-        cropped_image = crop_image(image, request.bounding_box.dict())
+        # Crop image
+        cropped_image = crop_image(input_image, {"x_min": x_min, "y_min": y_min, "x_max": x_max, "y_max": y_max})
 
-        # Remove the background from the cropped image
-        processed_image = remove_background(cropped_image)
+        # Remove background
+        bg_removed_image = remove_background(cropped_image)
 
-        # Define where to place the object image (coordinates are static for now)
-        coords = (100, 100)  # Example coordinates, can be dynamic or adjuste
+        # Place object image
+        coords = (100, 100)
+        final_image = place_object(bg_removed_image, object_image, coords)
 
-        # Generate a unique file name for the processed image
+        # Display Processed Image
+        st.image(final_image, caption="Processed Image", use_column_width=True)
+
+        # Save and Upload Processed Image to S3
         file_name = f"{uuid.uuid4()}.png"
-
-        # Save the processed image locally
-        processed_image.save(file_name, format="PNG")
-
-        # Upload the processed image to S3
+        final_image.save(file_name, format="PNG")
         s3_client.upload_file(
             file_name, AWS_BUCKET_NAME, file_name, ExtraArgs={"ContentType": "image/png"}
         )
-
-        # Generate the public URL for the uploaded image
         processed_image_url = f"https://{AWS_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/{file_name}"
-
-        # Remove the local file after upload to S3
         os.remove(file_name)
 
-        return ImageResponse(
-            original_image_url=request.image_url,
-            processed_image_url=processed_image_url,
-        )
+        # Display S3 URL
+        st.success("Image processed successfully!")
+        st.markdown(f"[Download Processed Image]({processed_image_url})")
 
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Error processing image: {str(e)}")
+        st.error(f"Error processing image: {e}")
