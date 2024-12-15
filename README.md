@@ -58,4 +58,57 @@ Once you have set up the environment and installed the dependencies, you can run
 ```bash
 uvicorn app:app --reload
 
+## API Usage
+
+### Endpoint
+
+- **POST** `/remove-background`
+
+This endpoint receives an image and returns a version with the background removed.
+
+### Input
+
+The input must be a **JSON object** containing the following fields:
+
+- `image_url` (string, required): URL of the image you want to process.  
+  The image URL should be publicly accessible (e.g., a link to an image hosted on a public image hosting service).
+  
+#### Example Request Body:
+
+```json
+{
+  "image_url": "https://example.com/your-image.png"
+}
+## Output
+
+The output will be a **JSON object** containing the URL to the image with the background removed.
+
+### Example Response Body:
+
+```json
+{
+  "image_url": "https://example.com/your-image-processed.png"
+}
+## Error Handling
+
+### Missing required field:
+If the required fields are missing, the API will return an error like this:
+
+```json
+{
+  "detail": "Field required"
+}
+### Postman Collection
+
+[<img src="https://run.pstmn.io/button.svg" alt="Run In Postman" style="width: 128px; height: 32px;">](https://app.getpostman.com/run-collection/33785306-d16069c2-06a8-42eb-b135-6f8274c184de?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D33785306-d16069c2-06a8-42eb-b135-6f8274c184de%26entityType%3Dcollection%26workspaceId%3D45dfb44a-9237-41be-9edd-bdba79abe8cd)
+
+### Deployment Link
+
+You can access the deployed application at the following link:
+
+[Background Removal API](https://os--backgroundremovalapi.streamlit.app/)
+
+
+
+
  
