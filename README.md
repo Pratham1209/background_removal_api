@@ -58,6 +58,8 @@ Once you have set up the environment and installed the dependencies, you can run
 ```bash
 uvicorn app:app --reload
 
+```
+
 ## API Usage
 
 ### Endpoint
@@ -75,7 +77,9 @@ The input must be a **JSON object** containing the following fields:
   
 #### Example Request Body:
 
-```json
+```
+```
+json
 {
   "image_url": "https://example.com/your-image.png"
 }
@@ -85,7 +89,9 @@ The output will be a **JSON object** containing the URL to the image with the ba
 
 ### Example Response Body:
 
-```json
+```
+```
+json
 {
   "image_url": "https://example.com/your-image-processed.png"
 }
@@ -94,10 +100,15 @@ The output will be a **JSON object** containing the URL to the image with the ba
 ### Missing required field:
 If the required fields are missing, the API will return an error like this:
 
-```json
+```
+```
+json
 {
   "detail": "Field required"
 }
+
+```
+```
 ### Postman Collection
 
 [<img src="https://run.pstmn.io/button.svg" alt="Run In Postman" style="width: 128px; height: 32px;">](https://app.getpostman.com/run-collection/33785306-d16069c2-06a8-42eb-b135-6f8274c184de?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D33785306-d16069c2-06a8-42eb-b135-6f8274c184de%26entityType%3Dcollection%26workspaceId%3D45dfb44a-9237-41be-9edd-bdba79abe8cd)
