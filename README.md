@@ -60,54 +60,30 @@ uvicorn app:app --reload
 
 ```
 
-## API Usage
+# API Usage
 
-### Endpoint
+## Endpoint
 
 - **POST** `/remove-background`
 
 This endpoint receives an image and returns a version with the background removed.
 
-### Input
+---
 
-The input must be a **JSON object** containing the following fields:
+## Input
 
-- `image_url` (string, required): URL of the image you want to process.  
-  The image URL should be publicly accessible (e.g., a link to an image hosted on a public image hosting service).
-  
-#### Example Request Body:
+The input must be a **JSON object** containing the following field:
 
-```
-```
-json
+- **`image_url`** (string, required):  
+  The URL of the image you want to process.  
+  Ensure the image URL is publicly accessible (e.g., hosted on a public image hosting service).
+
+### Example Request Body:
+
+```json
 {
-  "image_url": "[https://example.com/your-image.png](https://plus.unsplash.com/premium_photo-1675186049563-000f7ac02c44?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)"
+  "image_url": "https://example.com/your-image.png"
 }
-## Output
-
-The output will be a **JSON object** containing the URL to the image with the background removed.
-
-### Example Response Body:
-
-```
-```
-json
-{
-  "image_url": "[https://example.com/your-image-processed.png](https://image-processing-api-bucket.s3.us-east-1.amazonaws.com/6df0111b-4557-4ad9-adb6-d3f227041534.png)"
-}
-## Error Handling
-
-### Missing required field:
-If the required fields are missing, the API will return an error like this:
-
-```
-```
-json
-{
-  "detail": "Field required"
-}
-
-```
 ```
 ### Postman Collection
 
