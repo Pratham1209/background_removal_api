@@ -26,7 +26,7 @@ This repository provides an API for removing the background from images using de
 1. **Clone the Repository:**
 
     ```bash
-    git clone https://github.com/your-username/background-removal-api.git
+    git clone https://github.com/Pratham1209/background_removal_api.git
     cd background-removal-api
     ```
 
@@ -81,7 +81,7 @@ The input must be a **JSON object** containing the following fields:
 ```
 json
 {
-  "image_url": "https://example.com/your-image.png"
+  "image_url": "[https://example.com/your-image.png](https://plus.unsplash.com/premium_photo-1675186049563-000f7ac02c44?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)"
 }
 ## Output
 
@@ -93,7 +93,7 @@ The output will be a **JSON object** containing the URL to the image with the ba
 ```
 json
 {
-  "image_url": "https://example.com/your-image-processed.png"
+  "image_url": "[https://example.com/your-image-processed.png](https://image-processing-api-bucket.s3.us-east-1.amazonaws.com/6df0111b-4557-4ad9-adb6-d3f227041534.png)"
 }
 ## Error Handling
 
