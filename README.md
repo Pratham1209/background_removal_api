@@ -82,8 +82,15 @@ The input must be a **JSON object** containing the following field:
 
 ```json
 {
-  "image_url": "https://example.com/your-image.png"
+    "image_url": "https://plus.unsplash.com/premium_photo-1681449856688-2abd99ab5a73?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "bounding_box": {
+        "x_min": 1105,
+        "y_min": 972,
+        "x_max": 2783,
+        "y_max": 1800
+    }
 }
+
 ```
 ### Postman Collection
 
