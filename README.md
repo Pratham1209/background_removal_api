@@ -121,16 +121,17 @@ You can access the deployed application at the following link:
 
 ### Deployed App 
 
-Input Interface
+# Input Interface
 ![image](https://github.com/user-attachments/assets/9623c46f-374d-4587-a790-56ca59161326)
 
-Input Image Preview
+# Input Image Preview
 ![image](https://github.com/user-attachments/assets/b0651f49-d1cb-440a-9bc0-c760bf282bfd)
 
-Input Parameters
+# Input Parameters
 ![image](https://github.com/user-attachments/assets/337f9820-46aa-4c97-a929-a11aecad3d3a)
 
-Output Image with S3 Public Link
+# Output Image with S3 Public Link
+
 ![image](https://github.com/user-attachments/assets/63a61225-8f59-46f3-9222-a2eab0080e2c)
 
 
